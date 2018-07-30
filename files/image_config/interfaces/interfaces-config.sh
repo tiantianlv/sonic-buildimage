@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ifdown --force eth0
+ifdown eth0
 
 sonic-cfggen -d -t /usr/share/sonic/templates/interfaces.j2 > /etc/network/interfaces
 
