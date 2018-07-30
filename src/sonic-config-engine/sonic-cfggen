@@ -31,7 +31,6 @@ from portconfig import get_port_config
 from sonic_platform import get_machine_info
 from sonic_platform import get_platform_info
 from sonic_platform import get_system_mac
-from sonic_platform import get_fast_reboot_status
 from swsssdk import ConfigDBConnector
 from collections import OrderedDict
 from natsort import natsorted
@@ -206,8 +205,7 @@ def main():
     if args.platform_info:
         hardware_data = {'DEVICE_METADATA': {'localhost': {
             'platform': platform,
-            'mac': get_system_mac(),
-            'fast_reboot': get_fast_reboot_status()
+            'mac': get_system_mac()
             }}}
         deep_update(data, hardware_data)
 
