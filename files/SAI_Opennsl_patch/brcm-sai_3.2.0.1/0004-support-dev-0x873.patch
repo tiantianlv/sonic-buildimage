@@ -1,0 +1,21 @@
+
+---
+ src/brcm_sai_switch.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/brcm_sai_switch.c b/src/brcm_sai_switch.c
+index 3d60b0f..33d80c6 100644
+--- a/src/brcm_sai_switch.c
++++ b/src/brcm_sai_switch.c
+@@ -2502,7 +2502,7 @@ _brcm_sai_dev_set()
+     BRCM_SAI_LOG_SWITCH(SAI_LOG_LEVEL_INFO,
+                         "Switch detected Helix4 type device");
+   }
+-  if (dev == 0xb870)
++  if (dev == 0xb870  || dev == 0xb873)
+   {
+       /* TD3 */
+       chip_td3 = TRUE;
+-- 
+2.7.4
+

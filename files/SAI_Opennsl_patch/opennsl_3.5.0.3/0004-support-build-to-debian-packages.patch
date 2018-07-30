@@ -1,0 +1,569 @@
+
+---
+ debian/changelog                              |  35 +++++
+ debian/compat                                 |   1 +
+ debian/control                                |  26 ++++
+ debian/init.d.ex                              | 154 ++++++++++++++++++++++
+ debian/libopennsl-dev.dirs                    |   2 +
+ debian/libopennsl-dev.install                 |   4 +
+ debian/libopennsl-dev.links                   |   1 +
+ debian/libopennsl.dirs                        |   2 +
+ debian/libopennsl.install                     |   2 +
+ debian/opennsl-modules-3.16.0-4-amd64.dirs    |   1 +
+ debian/opennsl-modules-3.16.0-4-amd64.init    |  46 +++++++
+ debian/opennsl-modules-3.16.0-4-amd64.install |   3 +
+ debian/rules                                  | 181 ++++++++++++++++++++++++++
+ 13 files changed, 458 insertions(+)
+ create mode 100644 debian/changelog
+ create mode 100644 debian/compat
+ create mode 100644 debian/control
+ create mode 100644 debian/init.d.ex
+ create mode 100644 debian/libopennsl-dev.dirs
+ create mode 100644 debian/libopennsl-dev.install
+ create mode 100644 debian/libopennsl-dev.links
+ create mode 100644 debian/libopennsl.dirs
+ create mode 100644 debian/libopennsl.install
+ create mode 100644 debian/opennsl-modules-3.16.0-4-amd64.dirs
+ create mode 100755 debian/opennsl-modules-3.16.0-4-amd64.init
+ create mode 100644 debian/opennsl-modules-3.16.0-4-amd64.install
+ create mode 100755 debian/rules
+
+diff --git a/debian/changelog b/debian/changelog
+new file mode 100644
+index 0000000..7631b1b
+--- /dev/null
++++ b/debian/changelog
+@@ -0,0 +1,35 @@
++opennsl (3.5.0.3) UNRELEASED; urgency=medium
++
++  * Update to 3.5.0.3
++
++ -- V Moss <vmoss-brcm@users.noreply.github.com>  Mon, 27 March 2018 18:31:00 -0700
++
++opennsl (3.5.0.2) UNRELEASED; urgency=medium
++
++  * Update to 3.5.0.2
++
++ -- V Moss <vmoss-brcm@users.noreply.github.com>  Mon, 12 March 2018 18:31:00 -0700
++
++opennsl (3.2.3.7) UNRELEASED; urgency=medium
++
++  * Update to 3.2.3.7
++
++ -- V Moss <vmoss-brcm@users.noreply.github.com>  Thu, 10 Sep 2017 06:66:66 -0700
++
++opennsl (3.2.3.4) UNRELEASED; urgency=medium
++
++  * Update to 3.2.3.4
++
++ -- Qi Luo <qiluo-msft@users.noreply.github.com>  Thu, 08 Sep 2017 06:66:66 -0700
++
++opennsl (3.2.3.1) unstable; urgency=medium
++
++  * Update to 3.2.3.1
++
++ -- Qi Luo <qiluo-msft@users.noreply.github.com>  Tue, 11 Apr 2017 00:43:21 +0000
++
++opennsl (3.2.1.5) unstable; urgency=low
++
++  * Initial release
++
++ -- Guohan Lu <gulv@microsoft.com>  Fri, 18 Nov 2016 06:66:66 -0700
+diff --git a/debian/compat b/debian/compat
+new file mode 100644
+index 0000000..45a4fb7
+--- /dev/null
++++ b/debian/compat
+@@ -0,0 +1 @@
++8
+diff --git a/debian/control b/debian/control
+new file mode 100644
+index 0000000..59439a7
+--- /dev/null
++++ b/debian/control
+@@ -0,0 +1,26 @@
++Source: opennsl
++Section: main
++Priority: extra
++Maintainer: Guohan Lu <gulv@microsoft.com>
++Build-Depends: debhelper (>= 8.0.0), bzip2
++Standards-Version: 3.9.3
++#Vcs-Git: git://git.debian.org/collab-maint/bcmsdk.git
++#Vcs-Browser: http://git.debian.org/?p=collab-maint/bcmsdk.git;a=summary
++
++Package: opennsl-modules-3.16.0-4-amd64
++Architecture: amd64
++Section: main
++Depends: linux-image-3.16.0-4-amd64
++Description: kernel modules for broadcom opennsl sdk
++
++Package: libopennsl-dev
++Section: libdevel
++Architecture: any
++Depends: libopennsl (= ${binary:Version})
++Description: development library for broadcom opennsl sdk
++
++Package: libopennsl
++Section: libs
++Architecture: amd64
++Depends: ${shlibs:Depends}, ${misc:Depends}
++Description: shared library for broadcom opennsl sdk
+diff --git a/debian/init.d.ex b/debian/init.d.ex
+new file mode 100644
+index 0000000..8d6b9b5
+--- /dev/null
++++ b/debian/init.d.ex
+@@ -0,0 +1,154 @@
++#!/bin/sh
++### BEGIN INIT INFO
++# Provides:          bcmsdk
++# Required-Start:    $network $local_fs
++# Required-Stop:
++# Default-Start:     2 3 4 5
++# Default-Stop:      0 1 6
++# Short-Description: <Enter a short description of the software>
++# Description:       <Enter a long description of the software>
++#                    <...>
++#                    <...>
++### END INIT INFO
++
++# Author: Guohan Lu <gulv@microsoft.com>
++
++# PATH should only include /usr/* if it runs after the mountnfs.sh script
++PATH=/sbin:/usr/sbin:/bin:/usr/bin
++DESC=bcmsdk             # Introduce a short description here
++NAME=bcmsdk             # Introduce the short server's name here
++DAEMON=/usr/sbin/bcmsdk # Introduce the server's location here
++DAEMON_ARGS=""             # Arguments to run the daemon with
++PIDFILE=/var/run/$NAME.pid
++SCRIPTNAME=/etc/init.d/$NAME
++
++# Exit if the package is not installed
++[ -x $DAEMON ] || exit 0
++
++# Read configuration variable file if it is present
++[ -r /etc/default/$NAME ] && . /etc/default/$NAME
++
++# Load the VERBOSE setting and other rcS variables
++. /lib/init/vars.sh
++
++# Define LSB log_* functions.
++# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
++. /lib/lsb/init-functions
++
++#
++# Function that starts the daemon/service
++#
++do_start()
++{
++	# Return
++	#   0 if daemon has been started
++	#   1 if daemon was already running
++	#   2 if daemon could not be started
++	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
++		|| return 1
++	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- \
++		$DAEMON_ARGS \
++		|| return 2
++	# Add code here, if necessary, that waits for the process to be ready
++	# to handle requests from services started subsequently which depend
++	# on this one.  As a last resort, sleep for some time.
++}
++
++#
++# Function that stops the daemon/service
++#
++do_stop()
++{
++	# Return
++	#   0 if daemon has been stopped
++	#   1 if daemon was already stopped
++	#   2 if daemon could not be stopped
++	#   other if a failure occurred
++	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
++	RETVAL="$?"
++	[ "$RETVAL" = 2 ] && return 2
++	# Wait for children to finish too if this is a daemon that forks
++	# and if the daemon is only ever run from this initscript.
++	# If the above conditions are not satisfied then add some other code
++	# that waits for the process to drop all resources that could be
++	# needed by services started subsequently.  A last resort is to
++	# sleep for some time.
++	start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON
++	[ "$?" = 2 ] && return 2
++	# Many daemons don't delete their pidfiles when they exit.
++	rm -f $PIDFILE
++	return "$RETVAL"
++}
++
++#
++# Function that sends a SIGHUP to the daemon/service
++#
++do_reload() {
++	#
++	# If the daemon can reload its configuration without
++	# restarting (for example, when it is sent a SIGHUP),
++	# then implement that here.
++	#
++	start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name $NAME
++	return 0
++}
++
++case "$1" in
++  start)
++    [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC " "$NAME"
++    do_start
++    case "$?" in
++		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
++		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
++	esac
++  ;;
++  stop)
++	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
++	do_stop
++	case "$?" in
++		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
++		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
++	esac
++	;;
++  status)
++       status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
++       ;;
++  #reload|force-reload)
++	#
++	# If do_reload() is not implemented then leave this commented out
++	# and leave 'force-reload' as an alias for 'restart'.
++	#
++	#log_daemon_msg "Reloading $DESC" "$NAME"
++	#do_reload
++	#log_end_msg $?
++	#;;
++  restart|force-reload)
++	#
++	# If the "reload" option is implemented then remove the
++	# 'force-reload' alias
++	#
++	log_daemon_msg "Restarting $DESC" "$NAME"
++	do_stop
++	case "$?" in
++	  0|1)
++		do_start
++		case "$?" in
++			0) log_end_msg 0 ;;
++			1) log_end_msg 1 ;; # Old process is still running
++			*) log_end_msg 1 ;; # Failed to start
++		esac
++		;;
++	  *)
++	  	# Failed to stop
++		log_end_msg 1
++		;;
++	esac
++	;;
++  *)
++	#echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
++	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
++	exit 3
++	;;
++esac
++
++:
+diff --git a/debian/libopennsl-dev.dirs b/debian/libopennsl-dev.dirs
+new file mode 100644
+index 0000000..4418816
+--- /dev/null
++++ b/debian/libopennsl-dev.dirs
+@@ -0,0 +1,2 @@
++usr/lib
++usr/include
+diff --git a/debian/libopennsl-dev.install b/debian/libopennsl-dev.install
+new file mode 100644
+index 0000000..321b5dd
+--- /dev/null
++++ b/debian/libopennsl-dev.install
+@@ -0,0 +1,4 @@
++include/opennsl/* usr/include/opennsl
++include/shared/* usr/include/opennsl/shared
++include/sal/* usr/include/opennsl/sal
++sdk/include/* usr/include/bcm
+diff --git a/debian/libopennsl-dev.links b/debian/libopennsl-dev.links
+new file mode 100644
+index 0000000..31b5ebd
+--- /dev/null
++++ b/debian/libopennsl-dev.links
+@@ -0,0 +1 @@
++/usr/lib/libopennsl.so.1 /usr/lib/libopennsl.so
+diff --git a/debian/libopennsl.dirs b/debian/libopennsl.dirs
+new file mode 100644
+index 0000000..4f58528
+--- /dev/null
++++ b/debian/libopennsl.dirs
+@@ -0,0 +1,2 @@
++usr/lib
++usr/sbin
+diff --git a/debian/libopennsl.install b/debian/libopennsl.install
+new file mode 100644
+index 0000000..b908f00
+--- /dev/null
++++ b/debian/libopennsl.install
+@@ -0,0 +1,2 @@
++output/x86-xgs5-deb80/build/libopennsl.so.1 usr/lib
++output/x86-xgs5-deb80/sdk/linux/user/x86-smp_generic_64-2_6/netserve usr/sbin
+diff --git a/debian/opennsl-modules-3.16.0-4-amd64.dirs b/debian/opennsl-modules-3.16.0-4-amd64.dirs
+new file mode 100644
+index 0000000..49d4454
+--- /dev/null
++++ b/debian/opennsl-modules-3.16.0-4-amd64.dirs
+@@ -0,0 +1 @@
++lib/modules/3.16.0-4-amd64/extra
+diff --git a/debian/opennsl-modules-3.16.0-4-amd64.init b/debian/opennsl-modules-3.16.0-4-amd64.init
+new file mode 100755
+index 0000000..d215467
+--- /dev/null
++++ b/debian/opennsl-modules-3.16.0-4-amd64.init
+@@ -0,0 +1,46 @@
++#!/bin/bash
++
++### BEGIN INIT INFO
++# Provides:          load-opennsl-modules
++# Required-Start:
++# Required-Stop:
++# Should-Start:
++# Should-Stop:
++# Default-Start:     S
++# Default-Stop:      0 6
++# Short-Description: Load OpenNSL kernel modules
++### END INIT INFO
++
++case "$1" in
++start)
++	echo -n "Load OpenNSL kernel modules... "
++
++        modprobe linux-kernel-bde dmasize=16M maxpayload=128
++        modprobe linux-user-bde
++        modprobe linux-bcm-knet use_rx_skb=1
++
++	echo "done."
++	;;
++
++stop)
++	echo -n "Unload OpenNSL kernel modules... "
++
++        rmmod linux-bcm-knet
++        rmmod linux-user-bde
++        rmmod linux-kernel-bde
++
++	echo "done."
++	;;
++
++force-reload|restart)
++	echo "Not supported"
++	;;
++
++*)
++	echo "Usage: /etc/init.d/opennsl-modules-3.16.0-amd64.init {start|stop}"
++	exit 1
++	;;
++esac
++
++exit 0
++
+diff --git a/debian/opennsl-modules-3.16.0-4-amd64.install b/debian/opennsl-modules-3.16.0-4-amd64.install
+new file mode 100644
+index 0000000..39c891a
+--- /dev/null
++++ b/debian/opennsl-modules-3.16.0-4-amd64.install
+@@ -0,0 +1,3 @@
++output/x86-xgs5-deb80/build/linux-bcm-knet.ko lib/modules/3.16.0-4-amd64/extra
++output/x86-xgs5-deb80/build/linux-kernel-bde.ko lib/modules/3.16.0-4-amd64/extra
++output/x86-xgs5-deb80/build/linux-user-bde.ko lib/modules/3.16.0-4-amd64/extra
+diff --git a/debian/rules b/debian/rules
+new file mode 100755
+index 0000000..aaeee1f
+--- /dev/null
++++ b/debian/rules
+@@ -0,0 +1,181 @@
++#!/usr/bin/make -f
++# -*- makefile -*-
++# Sample debian/rules that uses debhelper.
++# This file was originally written by Joey Hess and Craig Small.
++# As a special exception, when this file is copied by dh-make into a
++# dh-make output file, you may use that output file without restriction.
++# This special exception was added by Craig Small in version 0.37 of dh-make.
++#
++# This version is for a hypothetical package that can build a kernel modules
++# architecture-dependant package via make-kpkg, as well as an
++# architecture-independent module source package, and other packages
++# either dep/indep for things like common files or userspace components
++# needed for the kernel modules.
++
++# Uncomment this to turn on verbose mode.
++#export DH_VERBOSE=1
++
++
++
++
++# some default definitions, important!
++#
++# Name of the source package
++psource:=opennsl-source
++
++# The short upstream name, used for the module source directory
++sname:=opennsl
++
++### KERNEL SETUP
++### Setup the stuff needed for making kernel module packages
++### taken from /usr/share/kernel-package/sample.module.rules
++
++# prefix of the target package name
++PACKAGE=opennsl-modules
++# modifieable for experiments or debugging m-a
++MA_DIR ?= /usr/share/modass
++# load generic variable handling
++-include $(MA_DIR)/include/generic.make
++# load default rules, including kdist, kdist_image, ...
++-include $(MA_DIR)/include/common-rules.make
++
++
++
++# module assistant calculates all needed things for us and sets
++# following variables:
++# KSRC (kernel source directory), KVERS (kernel version string), KDREV
++# (revision of the Debian kernel-image package), CC (the correct
++# compiler), VERSION (the final package version string), PKGNAME (full
++# package name with KVERS included), DEB_DESTDIR (path to store DEBs)
++
++# The kdist_config target is called by make-kpkg modules_config and
++# by kdist* rules by dependency. It should configure the module so it is
++# ready for compilation (mostly useful for calling configure).
++# prep-deb-files from module-assistant creates the neccessary debian/ files
++kdist_config: prep-deb-files
++
++# the kdist_clean target is called by make-kpkg modules_clean and from
++# kdist* rules. It is responsible for cleaning up any changes that have
++# been made by the other kdist_commands (except for the .deb files created)
++kdist_clean: clean
++	dh_testdir
++	dh_clean
++	$(MAKE) $(MFLAGS) -C output/x86-xgs5-deb80 clean
++#	rm -f driver/*.o driver/*.ko
++#
++### end  KERNEL SETUP
++
++configure: configure-stamp
++configure-stamp:
++	dh_testdir
++	# Add here commands to configure the package.
++
++	touch configure-stamp
++
++
++build-arch: configure-stamp  build-arch-stamp
++build-arch-stamp: 
++	dh_testdir
++
++	# Add here command to compile/build the package.
++	$(MAKE) -C output/x86-xgs5-deb80
++
++	touch $@
++
++#k = $(shell echo $(KVERS) | grep -q ^2.6 && echo k)
++
++build-indep:  configure-stamp build-indep-stamp
++build-indep-stamp: 
++	dh_testdir
++
++	# Add here command to compile/build the arch indep package.
++	# It's ok not to do anything here, if you don't need to build
++	#  anything for this package.
++	#docbook-to-man debian/opennsl.sgml > opennsl.1
++
++	touch $@
++
++build: build-arch
++
++clean: 
++	dh_testdir
++	#dh_testroot
++	rm -f build-arch-stamp build-indep-stamp configure-stamp
++
++	# Add here commands to clean up after the build process.
++	$(MAKE) -C output/x86-xgs5-deb80 clean
++
++	dh_clean
++
++install: DH_OPTIONS=
++install: build
++	dh_testdir
++	dh_testroot
++	dh_prep
++	dh_installdirs
++	dh_install
++
++# Build architecture-independent files here.
++# Pass -i to all debhelper commands in this target to reduce clutter.
++binary-indep: build install
++	dh_testdir -i
++	dh_testroot -i
++	dh_installchangelogs  -i
++	dh_installdocs -i
++	dh_installexamples -i
++#	dh_install -i
++#	dh_installmenu -i
++#	dh_installdebconf -i
++#	dh_installlogrotate -i
++#	dh_installemacsen -i
++#	dh_installpam -i
++#	dh_installmime -i
++#	dh_installinit -i
++#	dh_installcron -i
++#	dh_installinfo -i
++	dh_installman -i
++	dh_link -i
++	dh_compress -i
++	dh_fixperms -i
++	dh_installdeb -i
++#	dh_perl -i
++#	dh_makeshlibs -i
++	dh_installdeb -i
++	dh_shlibdeps -i
++	dh_gencontrol -i
++	dh_md5sums -i
++	dh_builddeb -i
++
++# Build architecture-dependent files here.
++binary-arch: build install
++	dh_testdir -s
++	dh_testroot -s
++#	dh_installdebconf -s
++
++	dh_installdocs -s
++	dh_installexamples -s
++	dh_installmenu -s
++#	dh_installlogrotate -s
++#	dh_installemacsen -s
++#	dh_installpam -s
++#	dh_installmime -s
++	dh_installmodules -s
++	dh_installinit -s
++	dh_installcron -s
++#	dh_installman -s
++	dh_installinfo -s
++	dh_installchangelogs  -s
++	dh_strip -s
++	dh_link -s
++	dh_compress -s
++	dh_fixperms -s
++	dh_makeshlibs -s
++	dh_installdeb -s
++#	dh_perl -s
++	dh_shlibdeps -s
++	dh_gencontrol -s
++	dh_md5sums -s
++	dh_builddeb -s
++
++binary: binary-indep binary-arch
++.PHONY: build clean binary-indep binary-arch binary install configure binary-modules kdist kdist_configure kdist_image kdist_clean
+-- 
+2.7.4
+

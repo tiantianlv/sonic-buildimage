@@ -1,0 +1,119 @@
+
+---
+ Makefile     |  6 ++++++
+ debian/rules |  0
+ src/Makefile | 30 +++++++++++++++---------------
+ 3 files changed, 21 insertions(+), 15 deletions(-)
+ mode change 100644 => 100755 debian/rules
+
+diff --git a/Makefile b/Makefile
+index 2e8c00d..8c47250 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,4 +1,10 @@
+ export DEBIAN_PKG=1
++
++OPENNSL_BASE=$(shell pwd)/../opennsl
++export OPENNSL_BASE
++OPENNSL_LIB=$(OPENNSL_BASE)/output/x86-xgs5-deb80
++export OPENNSL_LIB
++
+ all: 
+ 	$(MAKE) -k -C output/x86-xgs5-deb80
+ 
+diff --git a/debian/rules b/debian/rules
+old mode 100644
+new mode 100755
+diff --git a/src/Makefile b/src/Makefile
+index 9cc43c2..72c83ed 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -41,11 +41,11 @@ export SAI_ROOT =  $(SAI_BASE)/ocp_sai
+   endif
+ endif
+ 
+-ifeq ($(PLATFORM),)
++ifeq ($(BRCM_SAI_PLATFORM),)
+   ifneq ($(L7_PLATFORM),)
+-    PLATFORM = $(L7_PLATFORM)
++    BRCM_SAI_PLATFORM = $(L7_PLATFORM)
+   else 
+-    PLATFORM = x86-xgs5-deb80
++    BRCM_SAI_PLATFORM = x86-xgs5-deb80
+   endif
+ endif
+ 
+@@ -57,19 +57,19 @@ endif
+ 
+ CHIPS :=
+ 
+-ifeq ($(PLATFORM),x86-xgs5-deb80)
+-CHIPS += -DBCM_56850_A0 -DBCM_56860_A0 -DBCM_56960_A0 -DBCM_56970_A0 
+-CHIPS += -DNO_BCM_56850_A0 -DNO_BCM_56960_A0 -DNO_BCM_56860_A0 -DNO_BCM_56970_A0 
+-CFLAGS += -DOPENNSL_PHY_ROUTINES
++ifeq ($(BRCM_SAI_PLATFORM),x86-xgs5-deb80)
++CHIPS += -DBCM_56850_A0 -DBCM_56860_A0 -DBCM_56870_A0 -DBCM_56960_A0 -DBCM_56970_A0 
++CHIPS += -DNO_BCM_56850_A0 -DNO_BCM_56870_A0 -DNO_BCM_56960_A0 -DNO_BCM_56860_A0 -DNO_BCM_56970_A0 
++#CFLAGS += -DOPENNSL_PHY_ROUTINES
+ endif
+ 
+-ifeq ($(PLATFORM),cel-x86-helix4-ub16)
++ifeq ($(BRCM_SAI_PLATFORM),cel-x86-helix4-ub16)
+ CHIPS += -DBCM_56850_A0 -DBCM_56340_A0
+ CHIPS += -DNO_BCM_56850_A0 -DNO_BCM_56340_A0
+ endif
+ 
+ 
+-ifeq ($(PLATFORM),xlr-xgs5-ub14)
++ifeq ($(BRCM_SAI_PLATFORM),xlr-xgs5-ub14)
+ CHIPS += -DBCM_56870_A0 -DNO_BCM_56870_A0 -DCANCUN_SUPPORT
+ endif
+ 
+@@ -94,9 +94,9 @@ endif
+ 
+ ifeq ($(OPENNSL_BIN),)
+   ifeq ($(OPENNSL_EXTRACT),)
+-export OPENNSL_BIN = $(OPENNSL_BASE)/output/$(PLATFORM)/
++export OPENNSL_BIN = $(OPENNSL_BASE)/output/$(BRCM_SAI_PLATFORM)/
+   else
+-export OPENNSL_BIN = $(OPENNSL_BASE)/bin/$(PLATFORM)/
++export OPENNSL_BIN = $(OPENNSL_BASE)/bin/$(BRCM_SAI_PLATFORM)/
+   endif
+ endif
+ 
+@@ -216,7 +216,7 @@ ifeq ($(wildcard $(OPENNSL_BASE)/.*),)
+ 	@echo ""
+ 	@echo "Extracting OpenNSL binaries  ... please wait for completion."
+ 	@echo ""
+-	tar -xjf $(sai_src_dir)/opennsl/opennsl-*-odp-bin-$(PLATFORM).tar.bz2 -C $(OPENNSL_DST)/ ; 	
++	tar -xjf $(sai_src_dir)/opennsl/opennsl-*-odp-bin-$(BRCM_SAI_PLATFORM).tar.bz2 -C $(OPENNSL_DST)/ ; 	
+ endif
+ endif
+ endif
+@@ -281,7 +281,7 @@ ifeq ($(OPENNSL_EXTRACT),1)
+ 	@echo "Opennsl base not set. Can't continue !!"
+ else
+ 	@echo "Creating odp objs tgz for building final SAI lib..."
+-	cd $(OPENNSL_BASE)/output/$(PLATFORM); cp sdk/unix-user/x86-smp_generic_64-2_6/version.o libraries/; tar -czf libraries-odp.tgz libraries; cd -; cp $(OPENNSL_BASE)/output/$(PLATFORM)/libraries-odp.tgz .
++	cd $(OPENNSL_BASE)/output/$(BRCM_SAI_PLATFORM); cp sdk/unix-user/x86-smp_generic_64-2_6/version.o libraries/; tar -czf libraries-odp.tgz libraries; cd -; cp $(OPENNSL_BASE)/output/$(BRCM_SAI_PLATFORM)/libraries-odp.tgz .
+ endif
+ 
+ cdp-objs:
+@@ -289,12 +289,12 @@ ifeq ($(OPENNSL_EXTRACT),1)
+ 	@echo "Opennsl base not set. Can't continue !!"
+ else
+ 	@echo "Creating cdp objs tgz for building final SAI lib..."
+-	cd $(OPENNSL_BASE)/output/$(PLATFORM); cp sdk/unix-user/x86-smp_generic_64-2_6/version.o libraries/; tar -czf libraries-cdp.tgz libraries; cd -; cp $(OPENNSL_BASE)/output/$(PLATFORM)/libraries-cdp.tgz .
++	cd $(OPENNSL_BASE)/output/$(BRCM_SAI_PLATFORM); cp sdk/unix-user/x86-smp_generic_64-2_6/version.o libraries/; tar -czf libraries-cdp.tgz libraries; cd -; cp $(OPENNSL_BASE)/output/$(BRCM_SAI_PLATFORM)/libraries-cdp.tgz .
+ endif
+ 
+ odp-pkg:
+ 	@echo "Packaging SAI src release..."
+-	pushd $(OUTPATH); cd $(SAI_ROOT); cd ..; tar --transform='s,ocp_sai\/,,' --transform='s,^,brcm-sai-odp/,' -czf $(OUTPATH)/brcm-sai-$(SAI_RELEASE)-odp.tgz --exclude=ocp_sai/src/opennsl ocp_sai/Makefile ocp_sai/debian ocp_sai/RELEASE ocp_sai/src/ ocp_sai/data ocp_sai/include ocp_sai/doc output/$(PLATFORM)/Makefile output/$(PLATFORM)/package.cfg; popd
++	pushd $(OUTPATH); cd $(SAI_ROOT); cd ..; tar --transform='s,ocp_sai\/,,' --transform='s,^,brcm-sai-odp/,' -czf $(OUTPATH)/brcm-sai-$(SAI_RELEASE)-odp.tgz --exclude=ocp_sai/src/opennsl ocp_sai/Makefile ocp_sai/debian ocp_sai/RELEASE ocp_sai/src/ ocp_sai/data ocp_sai/include ocp_sai/doc output/$(BRCM_SAI_PLATFORM)/Makefile output/$(BRCM_SAI_PLATFORM)/package.cfg; popd
+ 
+ help:
+ 	@echo "Supported make options:"
+-- 
+2.7.4
+

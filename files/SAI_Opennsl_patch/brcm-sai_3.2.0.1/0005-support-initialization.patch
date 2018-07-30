@@ -1,0 +1,31 @@
+From 5c21dd2e584648163e484a8ad9e61a6e8d7c82aa Mon Sep 17 00:00:00 2001
+From: bolv <bolv@celestica.com>
+Date: Mon, 30 Jul 2018 17:56:51 +0800
+Subject: [PATCH] sai002
+
+---
+ src/brcm_sai_common.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/brcm_sai_common.c b/src/brcm_sai_common.c
+index bdd36da..a9f3953 100755
+--- a/src/brcm_sai_common.c
++++ b/src/brcm_sai_common.c
+@@ -1191,8 +1191,12 @@ _brcm_sai_l2_station_add(int tid, bcm_l2_station_t *l2_stn, int *station_id)
+         bcm_l2_stn.src_port_mask = 0x7ff;
+         bcm_l2_stn.src_port = tid;
+     }
+-    rv = bcm_l2_station_add(0, station_id, &bcm_l2_stn);
+-    BRCM_SAI_API_CHK(SAI_API_ROUTER_INTERFACE, "Add my stn entry", rv);
++    if(bcm_l2_stn.vlan != 0) {
++        rv = bcm_l2_station_add(0, station_id, &bcm_l2_stn);
++        BRCM_SAI_API_CHK(SAI_API_ROUTER_INTERFACE, "Add my stn entry", rv);
++    } else {
++        return 0;
++    }
+ 
+     return rv;
+ }
+-- 
+2.7.4
+

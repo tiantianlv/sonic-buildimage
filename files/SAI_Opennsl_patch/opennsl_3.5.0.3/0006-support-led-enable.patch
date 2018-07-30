@@ -1,0 +1,36 @@
+From c89bbc00c6a8c89a8a5a018bfb3e58347683b63d Mon Sep 17 00:00:00 2001
+From: bolv <bolv@celestica.com>
+Date: Mon, 30 Jul 2018 17:47:42 +0800
+Subject: [PATCH] 2222
+
+---
+ os/platform/bcmxgs/platform_init.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/os/platform/bcmxgs/platform_init.c b/os/platform/bcmxgs/platform_init.c
+index 7cd7efe..fb9a325 100644
+--- a/os/platform/bcmxgs/platform_init.c
++++ b/os/platform/bcmxgs/platform_init.c
+@@ -206,6 +206,9 @@ static char *common_init_commands[] =
+   "init soc",
+ #ifdef BCM_TRIDENT3_SUPPORT
+   CANCUN_PRE_MISC_INIT_STR,
++  "m0 status",
++  "m0 load 0 0x0 /usr/share/sonic/platform/linkscan_led_fw.bin",
++  "m0 load 0 0x3800 /usr/share/sonic/platform/custom_led.bin",
+ #endif
+   "init misc",
+ #ifdef BCM_TRIDENT3_SUPPORT
+@@ -221,6 +224,9 @@ static char *common_init_commands[] =
+   "local dma true",
+   "counter sync",
+   "*:led stop; *:led start",
++#ifdef BCM_TRIDENT3_SUPPORT
++  "rcload /usr/share/sonic/platform/opennsl-postinit.cfg",
++#endif
+ };
+ 
+ static int num_init_commands = sizeof(common_init_commands) / sizeof(common_init_commands[0]);
+-- 
+2.7.4
+

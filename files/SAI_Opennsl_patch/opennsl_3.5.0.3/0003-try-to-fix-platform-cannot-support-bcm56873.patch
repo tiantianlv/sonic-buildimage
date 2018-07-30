@@ -1,0 +1,39 @@
+
+---
+ os/platform/bcmxgs/platform_init.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/os/platform/bcmxgs/platform_init.c b/os/platform/bcmxgs/platform_init.c
+index 28ee469..7fafbb4 100644
+--- a/os/platform/bcmxgs/platform_init.c
++++ b/os/platform/bcmxgs/platform_init.c
+@@ -511,6 +511,10 @@ port_mapping_entry_t BCM56870_port_mapping[] =
+ {
+ };
+ 
++port_mapping_entry_t BCM56873_port_mapping[] =
++{
++};
++
+ int board_id_default(struct platform_data_s *board);
+ extern int driverSwitchIdGet(uint16_t *chipId, uint8_t *revision);
+ 
+@@ -557,6 +561,15 @@ struct platform_data_s platform_data[] =
+     sizeof(BCM56870_port_mapping) / sizeof(BCM56870_port_mapping[0]),
+     BCM56870_port_mapping
+   },
++  {
++    BCM56873_DEVICE_ID,
++    &board_id_default,
++    SVK_BCM956870K,
++    "Trident3 SVK",
++    sizeof(BCM56873_port_mapping) / sizeof(BCM56873_port_mapping[0]),
++    BCM56873_port_mapping
++  },
++
+ };
+ 
+ struct platform_data_s *discovered_board_data = NULL;
+-- 
+2.7.4
+

@@ -1,0 +1,43 @@
+
+---
+ os/platform/bcmxgs/platform_init.c | 1 -
+ tools/Make.common                  | 4 ++--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/os/platform/bcmxgs/platform_init.c b/os/platform/bcmxgs/platform_init.c
+index 7cd7efe..28ee469 100644
+--- a/os/platform/bcmxgs/platform_init.c
++++ b/os/platform/bcmxgs/platform_init.c
+@@ -90,7 +90,6 @@
+ #endif
+ 
+ #include "config.h"
+-#include "file.h"
+ #include "platform_config_api.h"
+ #include "driver_util.h"
+ 
+diff --git a/tools/Make.common b/tools/Make.common
+index c73bdac..b82f7f0 100755
+--- a/tools/Make.common
++++ b/tools/Make.common
+@@ -288,7 +288,7 @@ endif
+ #
+ # First declare most of the targets in this make file to be phony (not real files)
+ #
+-.PHONY: clean clean-all dump-variables examples kernel opennsl opennsldispatch opennsldriver os sdk sdk-gpl release cdp-bin rpc all $(SDK_FLAGS_FILE)
++.PHONY: clean clean-all dump-variables kernel opennsl opennsldispatch opennsldriver os sdk sdk-gpl release cdp-bin rpc all $(SDK_FLAGS_FILE)
+ 
+ .DEFAULT_GOAL := all
+ 
+@@ -325,7 +325,7 @@ ifeq ($(strip $(override-nsl-target)),)
+ all: OPENNSL_CFLAGS += -DINCLUDE_DIAG_SHELL
+ all: OPENNSL_SDK_FEATURE_LIST += CINT
+ all: export PLAT_LIBS += $(SDK_KBP_LIB)
+-all: $(add_targets) opennsl examples
++all: $(add_targets) opennsl
+ 	@:
+ else
+ all: $(override-nsl-target)
+-- 
+2.7.4
+

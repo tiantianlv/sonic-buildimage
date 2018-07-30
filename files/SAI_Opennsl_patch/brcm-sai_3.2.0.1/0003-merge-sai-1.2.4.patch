@@ -1,0 +1,201 @@
+
+---
+ include/sai/saiport.h            | 49 +++++++++++++++++++++++++++++++++++++++-
+ include/sai/saiqueue.h           |  2 +-
+ include/sai/sairouterinterface.h |  9 ++++++++
+ include/sai/saistatus.h          | 10 ++++----
+ include/sai/saitunnel.h          |  8 +++----
+ include/sai/saivlan.h            |  2 +-
+ 6 files changed, 68 insertions(+), 12 deletions(-)
+
+diff --git a/include/sai/saiport.h b/include/sai/saiport.h
+index 960691e..d8c75c7 100644
+--- a/include/sai/saiport.h
++++ b/include/sai/saiport.h
+@@ -169,6 +169,19 @@ typedef enum _sai_port_fec_mode_t
+ } sai_port_fec_mode_t;
+ 
+ /**
++ * @brief Priority flow control mode
++ */
++typedef enum _sai_port_priority_flow_control_mode_t
++{
++    /** Same value for RX/TX */
++    SAI_PORT_PRIORITY_FLOW_CONTROL_MODE_COMBINED,
++
++    /** Separate values for RX/TX */
++    SAI_PORT_PRIORITY_FLOW_CONTROL_MODE_SEPARATE,
++
++} sai_port_priority_flow_control_mode_t;
++
++/**
+  * @brief Attribute Id in sai_set_port_attribute() and
+  * sai_get_port_attribute() calls
+  */
+@@ -929,17 +942,51 @@ typedef enum _sai_port_attr_t
+     SAI_PORT_ATTR_QOS_EGRESS_BUFFER_PROFILE_LIST,
+ 
+     /**
++     * @brief Combined or separate Bit vectors for port PFC RX/TX
++     *
++     * @type sai_port_priority_flow_control_mode_t
++     * @flags CREATE_AND_SET
++     * @default SAI_PORT_PRIORITY_FLOW_CONTROL_MODE_COMBINED
++     */
++    SAI_PORT_ATTR_PRIORITY_FLOW_CONTROL_MODE,
++
++    /**
+      * @brief Bit vector enable/disable port PFC
+      *
+-     * Valid from bit 0 to bit 7.
++     * Valid from bit 0 to bit 7, for combined RX/TX control mode
+      *
+      * @type sai_uint8_t
+      * @flags CREATE_AND_SET
+      * @default 0
++     * @validonly SAI_PORT_ATTR_PRIORITY_FLOW_CONTROL_MODE == SAI_PORT_PRIORITY_FLOW_CONTROL_MODE_COMBINED
+      */
+     SAI_PORT_ATTR_PRIORITY_FLOW_CONTROL,
+ 
+     /**
++     * @brief Bit vector enable/disable port PFC RX
++     *
++     * Valid from bit 0 to bit 7, for separate RX/TX control mode
++     *
++     * @type sai_uint8_t
++     * @flags CREATE_AND_SET
++     * @default 0
++     * @validonly SAI_PORT_ATTR_PRIORITY_FLOW_CONTROL_MODE == SAI_PORT_PRIORITY_FLOW_CONTROL_MODE_SEPARATE
++     */
++    SAI_PORT_ATTR_PRIORITY_FLOW_CONTROL_RX,
++
++    /**
++     * @brief Bit vector enable/disable port PFC TX
++     *
++     * Valid from bit 0 to bit 7, for separate RX/TX control mode
++     *
++     * @type sai_uint8_t
++     * @flags CREATE_AND_SET
++     * @default 0
++     * @validonly SAI_PORT_ATTR_PRIORITY_FLOW_CONTROL_MODE == SAI_PORT_PRIORITY_FLOW_CONTROL_MODE_SEPARATE
++     */
++    SAI_PORT_ATTR_PRIORITY_FLOW_CONTROL_TX,
++
++    /**
+      * @brief User based Meta Data
+      *
+      * Value Range #SAI_SWITCH_ATTR_PORT_USER_META_DATA_RANGE.
+diff --git a/include/sai/saiqueue.h b/include/sai/saiqueue.h
+index 153a19c..d1e9517 100644
+--- a/include/sai/saiqueue.h
++++ b/include/sai/saiqueue.h
+@@ -329,7 +329,7 @@ typedef struct _sai_queue_deadlock_notification_data_t
+ 
+     /** Deadlock event */
+     sai_queue_pfc_deadlock_event_type_t event;
+-    
++
+     /**
+      * @brief Application based recovery management indicator.
+      *
+diff --git a/include/sai/sairouterinterface.h b/include/sai/sairouterinterface.h
+index 31023fd..8cc84df 100644
+--- a/include/sai/sairouterinterface.h
++++ b/include/sai/sairouterinterface.h
+@@ -231,6 +231,15 @@ typedef enum _sai_router_interface_attr_t
+     SAI_ROUTER_INTERFACE_ATTR_V6_MCAST_ENABLE,
+ 
+     /**
++     * @brief Packet action when a packet ingress and gets routed on the same RIF
++     *
++     * @type sai_packet_action_t
++     * @flags CREATE_AND_SET
++     * @default SAI_PACKET_ACTION_FORWARD
++     */
++    SAI_ROUTER_INTERFACE_ATTR_LOOPBACK_PACKET_ACTION,
++
++    /**
+      * @brief End of attributes
+      */
+     SAI_ROUTER_INTERFACE_ATTR_END,
+diff --git a/include/sai/saistatus.h b/include/sai/saistatus.h
+index f33d19f..0b93d92 100644
+--- a/include/sai/saistatus.h
++++ b/include/sai/saistatus.h
+@@ -259,27 +259,27 @@
+ /**
+  * @brief Is invalid attribute helper
+  */
+-#define SAI_STATUS_IS_INVALID_ATTRIBUTE(x)      ((x) & ~0xFFFF == SAI_STATUS_INVALID_ATTRIBUTE_0)
++#define SAI_STATUS_IS_INVALID_ATTRIBUTE(x)      (((x) & ~0xFFFF) == SAI_STATUS_INVALID_ATTRIBUTE_0)
+ 
+ /**
+  * @brief Is invalid attribute value helper
+  */
+-#define SAI_STATUS_IS_INVALID_ATTR_VALUE(x)     ((x) & ~0xFFFF == SAI_STATUS_INVALID_ATTR_VALUE_0)
++#define SAI_STATUS_IS_INVALID_ATTR_VALUE(x)     (((x) & ~0xFFFF) == SAI_STATUS_INVALID_ATTR_VALUE_0)
+ 
+ /**
+  * @brief Is attribute not implemented helper
+  */
+-#define SAI_STATUS_IS_ATTR_NOT_IMPLEMENTED(x)   ((x) & ~0xFFFF == SAI_STATUS_ATTR_NOT_IMPLEMENTED_0)
++#define SAI_STATUS_IS_ATTR_NOT_IMPLEMENTED(x)   (((x) & ~0xFFFF) == SAI_STATUS_ATTR_NOT_IMPLEMENTED_0)
+ 
+ /**
+  * @brief Is unknown attribute helper
+  */
+-#define SAI_STATUS_IS_UNKNOWN_ATTRIBUTE(x)      ((x) & ~0xFFFF == SAI_STATUS_INVALID_ATTRIBUTE_0)
++#define SAI_STATUS_IS_UNKNOWN_ATTRIBUTE(x)      (((x) & ~0xFFFF) == SAI_STATUS_INVALID_ATTRIBUTE_0)
+ 
+ /**
+  * @brief Is attribute not supported helper
+  */
+-#define SAI_STATUS_IS_ATTR_NOT_SUPPORTED(x)     ((x) & ~0xFFFF == SAI_STATUS_ATTR_NOT_SUPPORTED_0)
++#define SAI_STATUS_IS_ATTR_NOT_SUPPORTED(x)     (((x) & ~0xFFFF) == SAI_STATUS_ATTR_NOT_SUPPORTED_0)
+ 
+ /**
+  * @}
+diff --git a/include/sai/saitunnel.h b/include/sai/saitunnel.h
+index fd4f2b1..f2ef59c 100644
+--- a/include/sai/saitunnel.h
++++ b/include/sai/saitunnel.h
+@@ -548,9 +548,9 @@ typedef enum _sai_tunnel_attr_t
+      * @brief Tunnel encap mappers
+      *
+      * @type sai_object_list_t
+-     * @flags MANDATORY_ON_CREATE | CREATE_ONLY
++     * @flags CREATE_ONLY
+      * @objects SAI_OBJECT_TYPE_TUNNEL_MAP
+-     * @condition SAI_TUNNEL_ATTR_ENCAP_ECN_MODE == SAI_TUNNEL_ENCAP_ECN_MODE_USER_DEFINED
++     * @default empty
+      */
+     SAI_TUNNEL_ATTR_ENCAP_MAPPERS,
+ 
+@@ -569,9 +569,9 @@ typedef enum _sai_tunnel_attr_t
+      * @brief Tunnel decap mappers
+      *
+      * @type sai_object_list_t
+-     * @flags MANDATORY_ON_CREATE | CREATE_ONLY
++     * @flags CREATE_ONLY
+      * @objects SAI_OBJECT_TYPE_TUNNEL_MAP
+-     * @condition SAI_TUNNEL_ATTR_DECAP_ECN_MODE == SAI_TUNNEL_DECAP_ECN_MODE_USER_DEFINED
++     * @default empty
+      */
+     SAI_TUNNEL_ATTR_DECAP_MAPPERS,
+ 
+diff --git a/include/sai/saivlan.h b/include/sai/saivlan.h
+index a3c806c..c5ec664 100644
+--- a/include/sai/saivlan.h
++++ b/include/sai/saivlan.h
+@@ -311,7 +311,7 @@ typedef enum _sai_vlan_attr_t
+     SAI_VLAN_ATTR_UNKNOWN_UNICAST_FLOOD_GROUP,
+ 
+     /**
+-     * @brief Unknown unicast flood control type
++     * @brief Unknown multicast flood control type
+      *
+      * @type sai_vlan_flood_control_type_t
+      * @flags CREATE_AND_SET
+-- 
+2.7.4
+
