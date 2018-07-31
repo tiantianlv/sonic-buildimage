@@ -14,9 +14,9 @@ class SfpUtil(SfpUtilBase):
     """Platform-specific SfpUtil class"""
 
     PORT_START = 1
-    PORT_END = 54
+    PORT_END = 56
     QSFP_PORT_START = 49
-    QSFP_PORT_END = 54
+    QSFP_PORT_END = 56
 
     EEPROM_OFFSET = 1
 
