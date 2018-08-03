@@ -1,6 +1,5 @@
 #Enable all ports
-sleep 6
-port all en=1
+#port all en=1
 #sleep 6
 #linkscan 250000; port xe,ce linkscan=on
 

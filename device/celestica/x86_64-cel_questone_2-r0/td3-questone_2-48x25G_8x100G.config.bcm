@@ -14,7 +14,8 @@ module_64ports=1
 oversubscribe_mode=1
 parity_enable=0
 pbmp_gport_stack.0=0x0000000000000000000000000000000000000000000000000000000000000000
-pbmp_xport_xe=0x48878787f8787808dfe1e0203e1e1e022
+#pbmp_xport_xe=0x48878787f8787808dfe1e0203e1e1e022
+pbmp_xport_xe=0x8878787f87878089fe1e0203e1e1e022
 
 
 ptp_ts_pll_fref=50000000
@@ -77,8 +78,8 @@ portmap_117.0=115:25
 portmap_118.0=116:25
 portmap_123.0=121:100
 portmap_127.0=125:100
-portmap_66.0=129:10:m
-portmap_130.0=128:10:m
+#portmap_66.0=129:10:m
+#portmap_130.0=128:10:m
 phy_chain_tx_lane_map_physical{1.0}=0x0123
 phy_chain_rx_lane_map_physical{1.0}=0x1302
 phy_chain_tx_lane_map_physical{5.0}=0x1032
@@ -119,8 +120,8 @@ phy_chain_tx_lane_map_physical{121.0}=0x2301
 phy_chain_rx_lane_map_physical{121.0}=0x2031
 phy_chain_tx_lane_map_physical{125.0}=0x0132
 phy_chain_rx_lane_map_physical{125.0}=0x3012
-phy_chain_tx_lane_map_physical{129.0}=0x3210
-phy_chain_rx_lane_map_physical{129.0}=0x0231
+#phy_chain_tx_lane_map_physical{129.0}=0x3210
+#phy_chain_rx_lane_map_physical{129.0}=0x0231
 phy_chain_tx_polarity_flip_physical{1.0}=0x0
 phy_chain_rx_polarity_flip_physical{1.0}=0x0
 phy_chain_tx_polarity_flip_physical{2.0}=0x0
@@ -283,14 +284,14 @@ phy_chain_tx_polarity_flip_physical{128.0}=0x1
 phy_chain_rx_polarity_flip_physical{128.0}=0x1
 
 #MC P/N flip
-phy_chain_tx_polarity_flip_physical{129.0}=0x0
-phy_chain_rx_polarity_flip_physical{129.0}=0x1
-phy_chain_tx_polarity_flip_physical{130.0}=0x0
-phy_chain_rx_polarity_flip_physical{130.0}=0x0
-phy_chain_tx_polarity_flip_physical{131.0}=0x1
-phy_chain_rx_polarity_flip_physical{131.0}=0x0
-phy_chain_tx_polarity_flip_physical{132.0}=0x0
-phy_chain_rx_polarity_flip_physical{132.0}=0x1
+#phy_chain_tx_polarity_flip_physical{129.0}=0x0
+#phy_chain_rx_polarity_flip_physical{129.0}=0x1
+#phy_chain_tx_polarity_flip_physical{130.0}=0x0
+#phy_chain_rx_polarity_flip_physical{130.0}=0x0
+#phy_chain_tx_polarity_flip_physical{131.0}=0x1
+#phy_chain_rx_polarity_flip_physical{131.0}=0x0
+#phy_chain_tx_polarity_flip_physical{132.0}=0x0
+#phy_chain_rx_polarity_flip_physical{132.0}=0x1
 
 
 dport_map_port_49=1
