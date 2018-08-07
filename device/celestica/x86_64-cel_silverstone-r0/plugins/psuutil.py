@@ -8,7 +8,8 @@ import re
 try:
     from sonic_psu.psu_base import PsuBase
 except ImportError as e:
-    raise ImportError (str(e) + "- required module not found")
+    raise ImportError(str(e) + "- required module not found")
+
 
 class PsuUtil(PsuBase):
     """Platform-specific PSUutil class"""
@@ -22,12 +23,12 @@ class PsuUtil(PsuBase):
 
         if proc.returncode != 0:
             sys.exit(proc.returncode)
-    
+
         return out
-    
+
     def find_value(self, grep_string):
         return re.findall("[-+]?\d*\.\d+|\d+", grep_string)
-        
+
     def get_num_psus(self):
         """
         Retrieves the number of PSUs available on the device
@@ -44,15 +45,16 @@ class PsuUtil(PsuBase):
         """
         if index is None:
             return False
-        grep_key = "PSUL_CIn" if index == 1 else "PSUR_CIn"
-        grep_string = self.run_command('ipmitool sdr | grep '+ grep_key)
-        raw_cIn_value = self.find_value(grep_string)
-        cIn_value = float(raw_cIn_value[0])
-        
-        if float(cIn_value) == 0.0:
-            return False
 
-        return True
+        ''' L index = 2 , R index = 1 
+            Power status is active hight
+        '''
+        res = self.run_command('ipmitool raw 0x3a 0x0c 0x00 0x02 0x60')
+        status = int(res) & 0x3
+        if index == 1:
+            return status & 1
+        else:
+            return (status >> 1) & 1
 
     def get_psu_presence(self, index):
         """
@@ -64,5 +66,12 @@ class PsuUtil(PsuBase):
         if index is None:
             return False
 
-        ### TBD ###
-        return True
+        ''' L index = 2 , R index = 1 
+            Presence status is active Low
+        '''
+        res = self.run_command('ipmitool raw 0x3a 0x0c 0x00 0x02 0x60')
+        status = int(res) & 0xc
+        if index == 1:
+            return not((status >> 2) & 1)
+        else:
+            return not((status >> 3) & 1)

@@ -14,11 +14,13 @@ class SfpUtil(SfpUtilBase):
     """Platform-specific SfpUtil class"""
 
     PORT_START = 1
-    PORT_END = 56
-    QSFP_PORT_START = 49
-    QSFP_PORT_END = 56
+    PORT_END = 34
+    QSFP_PORT_START = 1
+    QSFP_PORT_END = 32
 
-    EEPROM_OFFSET = 1
+    EEPROM_OFFSET = 10
+
+    BASE_SFF_PATH = "/sys/devices/platform/AS58128.switchboard/SFF/"
 
     _port_name = ""
     _port_to_eeprom_mapping = {}
@@ -40,18 +42,19 @@ class SfpUtil(SfpUtilBase):
         return self._port_to_eeprom_mapping
 
     def get_port_name(self, port_num):
-        if port_num > self.QSFP_PORT_START - 1:
-            self._port_name = "QSFP" + str(port_num - self.QSFP_PORT_START + 1)
+        if port_num <= self.QSFP_PORT_END:
+            self._port_name = "QSFP" + str(port_num)
         else:
-            self._port_name = "SFP" + str(port_num)
+            self._port_name = "SFP" + str(port_num - self.QSFP_PORT_END)
         return self._port_name
 
     def __init__(self):
         # Override port_to_eeprom_mapping for class initialization
         eeprom_path = '/sys/bus/i2c/devices/i2c-{0}/{0}-0050/eeprom'
 
-        for x in range(self.PORT_START, self.PORT_END+1):
-            self.port_to_eeprom_mapping[x] = eeprom_path.format(x + self.EEPROM_OFFSET)
+        for x in range(self.PORT_START, self.PORT_END + 1):
+            self.port_to_eeprom_mapping[x] = eeprom_path.format(
+                x + self.EEPROM_OFFSET - 1)
         SfpUtilBase.__init__(self)
 
     def get_presence(self, port_num):
@@ -62,10 +65,11 @@ class SfpUtil(SfpUtilBase):
         sysfs_filename = "sfp_modabs"
         port_name = self.get_port_name(port_num)
         if port_num in self.qsfp_ports:
-	    sysfs_filename = "qsfp_modprs"
+            sysfs_filename = "qsfp_modprs"
         try:
 
-            reg_file = open("/sys/devices/platform/questone2/SFF/"+port_name+"/"+sysfs_filename)
+            reg_file = open(self.BASE_SFF_PATH +
+                            port_name + "/" + sysfs_filename)
 
         except IOError as e:
             print "Error: unable to open file: %s" % str(e)
@@ -83,12 +87,12 @@ class SfpUtil(SfpUtilBase):
 
     def get_low_power_mode(self, port_num):
         # Check for invalid QSFP port_num
-        if port_num < self.port_start or port_num > self.port_end or port_num <= 48:
+        if port_num < self.port_start or port_num > self.port_end or port_num > self.QSFP_PORT_END:
             return False
 
         try:
             port_name = self.get_port_name(port_num)
-            reg_file = open("/sys/devices/platform/questone2/SFF/"+port_name+"/qsfp_lpmode")
+            reg_file = open(self.BASE_SFF_PATH + port_name + "/qsfp_lpmode")
         except IOError as e:
             print "Error: unable to open file: %s" % str(e)
             return False
@@ -104,12 +108,13 @@ class SfpUtil(SfpUtilBase):
 
     def set_low_power_mode(self, port_num, lpmode):
         # Check for invalid QSFP port_num
-        if port_num < self.port_start or port_num > self.port_end or port_num <= 48:
+        if port_num < self.port_start or port_num > self.port_end or port_num > self.QSFP_PORT_END:
             return False
 
         try:
             port_name = self.get_port_name(port_num)
-            reg_file = open("/sys/devices/platform/questone2/SFF/"+port_name+"/qsfp_lpmode", "r+")
+            reg_file = open(self.BASE_SFF_PATH +
+                            port_name + "/qsfp_lpmode", "r+")
         except IOError as e:
             print "Error: unable to open file: %s" % str(e)
             return False
@@ -124,12 +129,13 @@ class SfpUtil(SfpUtilBase):
 
     def reset(self, port_num):
         # Check for invalid QSFP port_num
-        if port_num < self.port_start or port_num > self.port_end or port_num <= 48:
+        if port_num < self.port_start or port_num > self.port_end or port_num > self.QSFP_PORT_END:
             return False
 
         try:
             port_name = self.get_port_name(port_num)
-            reg_file = open("/sys/devices/platform/questone2/SFF/"+port_name+"/qsfp_reset", "w")
+            reg_file = open(self.BASE_SFF_PATH +
+                            port_name + "/qsfp_reset", "w")
         except IOError as e:
             print "Error: unable to open file: %s" % str(e)
             return False
@@ -142,9 +148,11 @@ class SfpUtil(SfpUtilBase):
         # Sleep 1 second to allow it to settle
         time.sleep(1)
 
-        # Flip the bit back high and write back to the register to take port out of reset
+        # Flip the bit back high and write back to the register to take port
+        # out of reset
         try:
-            reg_file = open("/sys/devices/platform/questone2/SFF/"+port_name+"/qsfp_reset", "w")
+            reg_file = open(self.BASE_SFF_PATH +
+                            port_name + "/qsfp_reset", "w")
         except IOError as e:
             print "Error: unable to open file: %s" % str(e)
             return False
