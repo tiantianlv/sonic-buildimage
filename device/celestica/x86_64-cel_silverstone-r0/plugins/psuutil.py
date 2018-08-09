@@ -46,15 +46,15 @@ class PsuUtil(PsuBase):
         if index is None:
             return False
 
-        ''' L index = 2 , R index = 1 
+        ''' L index = 1 , R index = 2 
             Power status is active hight
         '''
         res = self.run_command('ipmitool raw 0x3a 0x0c 0x00 0x02 0x60')
-        status = int(res) & 0x3
+        status = int(res,16) & 0x3
         if index == 1:
-            return status & 1
-        else:
             return (status >> 1) & 1
+        else:
+            return status & 1
 
     def get_psu_presence(self, index):
         """
@@ -66,12 +66,12 @@ class PsuUtil(PsuBase):
         if index is None:
             return False
 
-        ''' L index = 2 , R index = 1 
+        ''' L index = 1 , R index = 2 
             Presence status is active Low
         '''
         res = self.run_command('ipmitool raw 0x3a 0x0c 0x00 0x02 0x60')
-        status = int(res) & 0xc
+        status = int(res,16) & 0xc
         if index == 1:
-            return not((status >> 2) & 1)
-        else:
             return not((status >> 3) & 1)
+        else:
+            return not((status >> 2) & 1)
