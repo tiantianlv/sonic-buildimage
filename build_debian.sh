@@ -204,7 +204,6 @@ sudo LANG=C DEBIAN_FRONTEND=noninteractive chroot $FILESYSTEM_ROOT apt-get -y in
     openssh-server          \
     python                  \
     python-setuptools       \
-    rsyslog                 \
     monit                   \
     python-apt              \
     traceroute              \
@@ -228,6 +227,10 @@ sudo LANG=C DEBIAN_FRONTEND=noninteractive chroot $FILESYSTEM_ROOT apt-get -y in
     ethtool                 \
     ipmitool
 
+
+# Install a newer version of rsyslog from jessie-backports in hopes of
+# eliminating memory leaks
+sudo LANG=C DEBIAN_FRONTEND=noninteractive chroot $FILESYSTEM_ROOT apt-get -y -t jessie-backports install rsyslog
 
 sudo LANG=C DEBIAN_FRONTEND=noninteractive chroot $FILESYSTEM_ROOT apt-get -y download \
     grub-pc-bin
@@ -271,6 +274,7 @@ check system $HOST
 EOF
 
 ## Config sysctl
+## TODO: ipfrag* are for mitigating CVE-2018-5391, remove after kernel upgraded
 sudo mkdir -p $FILESYSTEM_ROOT/var/core
 sudo augtool --autosave "
 set /files/etc/sysctl.conf/kernel.core_pattern '|/usr/bin/coredump-compress %e %t %p'
@@ -308,6 +312,9 @@ set /files/etc/sysctl.conf/net.ipv6.conf.eth0.accept_ra_defrtr 0
 
 set /files/etc/sysctl.conf/net.core.rmem_max 2097152
 set /files/etc/sysctl.conf/net.core.wmem_max 2097152
+
+set /files/etc/sysctl.conf/net.ipv4.ipfrag_high_thresh 262144
+set /files/etc/sysctl.conf/net.ipv4.ipfrag_low_thresh 196608
 " -r $FILESYSTEM_ROOT
 
 ## docker-py is needed by Ansible docker module
