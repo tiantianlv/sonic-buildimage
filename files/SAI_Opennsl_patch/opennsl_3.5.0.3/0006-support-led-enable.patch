@@ -16,8 +16,8 @@ index 7cd7efe..fb9a325 100644
  #ifdef BCM_TRIDENT3_SUPPORT
    CANCUN_PRE_MISC_INIT_STR,
 +  "m0 status",
-+  "m0 load 0 0x0 /usr/share/sonic/platform/linkscan_led_fw.bin",
-+  "m0 load 0 0x3800 /usr/share/sonic/platform/custom_led.bin",
++  "m0 load 0 0x0 /etc/bcm/linkscan_led_fw.bin",
++  "m0 load 0 0x3800 /etc/bcm/custom_led.bin",
  #endif
    "init misc",
  #ifdef BCM_TRIDENT3_SUPPORT
