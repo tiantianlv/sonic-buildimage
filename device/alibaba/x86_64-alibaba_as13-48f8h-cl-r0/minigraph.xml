@@ -935,7 +935,7 @@
     <Devices>
       <Device i:type="LeafRouter">
         <Hostname>sonic</Hostname>
-        <HwSku>Questone_2</HwSku>
+        <HwSku>Fishstone48</HwSku>
       </Device>
     </Devices>
   </PngDec>
@@ -970,5 +970,5 @@
     <Properties xmlns:a="http://schemas.datacontract.org/2004/07/Microsoft.Search.Autopilot.Evolution"/>
   </MetadataDeclaration>
   <Hostname>sonic</Hostname>
-  <HwSku>Questone_2</HwSku>
+  <HwSku>Fishstone48</HwSku>
 </DeviceMiniGraph>
