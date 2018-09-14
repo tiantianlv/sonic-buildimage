@@ -14,11 +14,11 @@ class SfpUtil(SfpUtilBase):
     """Platform-specific SfpUtil class"""
 
     PORT_START = 1
-    PORT_END = 54
+    PORT_END = 56
     QSFP_PORT_START = 49
-    QSFP_PORT_END = 54
+    QSFP_PORT_END = 56
 
-    EEPROM_OFFSET = 1
+    EEPROM_OFFSET = 9
 
     _port_name = ""
     _port_to_eeprom_mapping = {}
@@ -65,7 +65,7 @@ class SfpUtil(SfpUtilBase):
 	    sysfs_filename = "qsfp_modprs"
         try:
 
-            reg_file = open("/sys/devices/platform/questone2/SFF/"+port_name+"/"+sysfs_filename)
+            reg_file = open("/sys/devices/platform/fishbone48/SFF/"+port_name+"/"+sysfs_filename)
 
         except IOError as e:
             print "Error: unable to open file: %s" % str(e)
@@ -88,7 +88,7 @@ class SfpUtil(SfpUtilBase):
 
         try:
             port_name = self.get_port_name(port_num)
-            reg_file = open("/sys/devices/platform/questone2/SFF/"+port_name+"/qsfp_lpmode")
+            reg_file = open("/sys/devices/platform/fishbone48/SFF/"+port_name+"/qsfp_lpmode")
         except IOError as e:
             print "Error: unable to open file: %s" % str(e)
             return False
@@ -109,7 +109,7 @@ class SfpUtil(SfpUtilBase):
 
         try:
             port_name = self.get_port_name(port_num)
-            reg_file = open("/sys/devices/platform/questone2/SFF/"+port_name+"/qsfp_lpmode", "r+")
+            reg_file = open("/sys/devices/platform/fishbone48/SFF/"+port_name+"/qsfp_lpmode", "r+")
         except IOError as e:
             print "Error: unable to open file: %s" % str(e)
             return False
@@ -129,7 +129,7 @@ class SfpUtil(SfpUtilBase):
 
         try:
             port_name = self.get_port_name(port_num)
-            reg_file = open("/sys/devices/platform/questone2/SFF/"+port_name+"/qsfp_reset", "w")
+            reg_file = open("/sys/devices/platform/fishbone48/SFF/"+port_name+"/qsfp_reset", "w")
         except IOError as e:
             print "Error: unable to open file: %s" % str(e)
             return False
@@ -144,7 +144,7 @@ class SfpUtil(SfpUtilBase):
 
         # Flip the bit back high and write back to the register to take port out of reset
         try:
-            reg_file = open("/sys/devices/platform/questone2/SFF/"+port_name+"/qsfp_reset", "w")
+            reg_file = open("/sys/devices/platform/fishbone48/SFF/"+port_name+"/qsfp_reset", "w")
         except IOError as e:
             print "Error: unable to open file: %s" % str(e)
             return False
