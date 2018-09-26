@@ -67,6 +67,7 @@ class SensorUtil():
         except:
             print "Error: Unable to access sensor information"
             return 0
+            
         return input_num
 
 
@@ -87,7 +88,6 @@ class SensorUtil():
             sensor_name = sensor_data.get('name')
 
         except:
-            print "Error: Unable to access sensor information"
             return "N/A"
 
         return sensor_name
@@ -114,7 +114,6 @@ class SensorUtil():
             sensor_data_key = sensor_data.keys()
             sensor_input_name = sensor_data_key[input_index-1]
         except:
-            print "Error: Unable to access sensor information"
             return "N/A"
 
         return sensor_input_name
@@ -143,7 +142,6 @@ class SensorUtil():
             sensor_data_str = sensor_input_raw.split()
             sensor_input_type = self.input_type_selector(sensor_data_str[1])
         except:
-            print "Error: Unable to access sensor information"
             return "N/A"
 
         return sensor_input_type
