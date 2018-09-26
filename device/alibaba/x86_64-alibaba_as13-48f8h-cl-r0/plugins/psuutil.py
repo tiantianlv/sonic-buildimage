@@ -119,11 +119,10 @@ class PsuUtil(PsuBase):
             for psu_fru in self.psu_info_list:            
                 psu_sn  = str(psu_fru.get(psu_sn_key)).strip()
                 if psu_fru.get(psu_key) is not None:
-                    serial_number = psu_sn
+                    serial_number = psu_sn if psu_sn.strip() != "" else "N/A"
                     break
 
         except:
-            print "Error: Unable to access PSU product number information"
             return "N/A"
 
         return serial_number
@@ -147,11 +146,10 @@ class PsuUtil(PsuBase):
             for psu_fru in self.psu_info_list:         
                 psu_pn  = str(psu_fru.get(psu_pn_key)).strip()
                 if psu_fru.get(psu_key) is not None:
-                    product_name = psu_pn
+                    product_name = psu_pn if psu_pn.strip() != "" else "N/A"
                     break
 
         except:
-            print "Error: Unable to access PSU serial number information"
             return "N/A"
 
         return product_name

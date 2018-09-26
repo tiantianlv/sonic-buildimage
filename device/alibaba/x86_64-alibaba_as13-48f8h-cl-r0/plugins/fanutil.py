@@ -61,8 +61,7 @@ class FanUtil():
                     fan_speed = fan_sp_list[0]
 
         except:
-            print "Error: Unable to access fan speed information"
-            return "N/A"
+            return 0
 
         return fan_speed
 
@@ -94,7 +93,6 @@ class FanUtil():
                     fan_low_threshold = fan_sp_list[1]
 
         except:
-            print "Error: Unable to access fan threshold information"
             return "N/A"
 
         return fan_low_threshold
@@ -127,8 +125,7 @@ class FanUtil():
                     fan_high_threshold = fan_sp_list[2]
 
         except:
-            print "Error: Unable to access fan threshold information"
-            return "N/A"
+            return 0
 
         return fan_high_threshold
 
@@ -156,7 +153,6 @@ class FanUtil():
                     fan_pn = serial[0].split()[4]                 
 
         except:
-            print "Error: Unable to access product number information"
             return "N/A"
 
         return fan_pn
@@ -185,7 +181,6 @@ class FanUtil():
                     fan_sn = serial[0].split()[4]                 
 
         except:
-            print "Error: Unable to access serial number information"
             return "N/A"
 
         return fan_sn
