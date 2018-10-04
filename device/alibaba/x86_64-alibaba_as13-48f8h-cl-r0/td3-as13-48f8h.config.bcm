@@ -334,9 +334,66 @@ dport_map_port_67=54
 dport_map_port_79=55
 dport_map_port_71=56
 
-# configuration for 5M DAC
-#serdes_preemphasis=0x1a400a
+#Pre-emphasis configuration for optical module 
+# configuration for 25G optical module
+serdes_preemphasis_49=0x134809
+serdes_preemphasis_50=0x124909
+serdes_preemphasis_51=0x124909
+serdes_preemphasis_52=0x124909
+serdes_preemphasis_13=0x124909
+serdes_preemphasis_14=0x124909
+serdes_preemphasis_15=0x124909
+serdes_preemphasis_16=0x124909
+serdes_preemphasis_21=0x104b09
+serdes_preemphasis_22=0x104b09
+serdes_preemphasis_23=0x0f4c09
+serdes_preemphasis_24=0x0f4c09
+serdes_preemphasis_29=0x0f4c09
+serdes_preemphasis_30=0x0f4c09
+serdes_preemphasis_31=0x0f4c09
+serdes_preemphasis_32=0x0e4d09
+serdes_preemphasis_33=0x0e4d09
+serdes_preemphasis_34=0x0c4f09
+serdes_preemphasis_35=0x0c4f09
+serdes_preemphasis_36=0x0c4f09
+serdes_preemphasis_41=0x0c4f09
+serdes_preemphasis_42=0x0c4f09
+serdes_preemphasis_43=0x0c4f09
+serdes_preemphasis_44=0x0c4f09
+serdes_preemphasis_1=0x0f4c09
+serdes_preemphasis_2=0x0f4c09
+serdes_preemphasis_3=0x0e4d09
+serdes_preemphasis_4=0x0f4c09
+serdes_preemphasis_5=0x0e4d09
+serdes_preemphasis_6=0x0e4d09
+serdes_preemphasis_7=0x0e4d09
+serdes_preemphasis_8=0x0e4d09
+serdes_preemphasis_87=0x0c4f09
+serdes_preemphasis_88=0x0c4f09
+serdes_preemphasis_89=0x0c4f09
+serdes_preemphasis_90=0x0c4f09
+serdes_preemphasis_95=0x0c4f09
+serdes_preemphasis_96=0x0c4f09
+serdes_preemphasis_97=0x0c4f09
+serdes_preemphasis_98=0x0c4f09
+serdes_preemphasis_99=0x0c4f09
+serdes_preemphasis_100=0x0e4d09
+serdes_preemphasis_101=0x0e4d09
+serdes_preemphasis_102=0x0f4c09
+serdes_preemphasis_107=0x0f4c09
+serdes_preemphasis_108=0x0f4c09
+serdes_preemphasis_109=0x0f4c09
+serdes_preemphasis_110=0x0f4c09
 
+# configuration for 100G optical module
+serdes_preemphasis_57=0x154708
+serdes_preemphasis_61=0x154708
+serdes_preemphasis_123=0x154708
+serdes_preemphasis_115=0x154708
+serdes_preemphasis_127=0x154708
+serdes_preemphasis_67=0x154708
+serdes_preemphasis_79=0x154708
+serdes_preemphasis_71=0x154708
 
 reglist_enable=1
 scache_filename=/tmp/scache
