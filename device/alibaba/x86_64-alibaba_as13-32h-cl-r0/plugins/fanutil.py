@@ -26,6 +26,16 @@ class FanUtil():
         return self.fru_data_list, self.sensor_data_list
 
 
+    def name_to_index(self, fan_name):
+        # Get fan index from fan name
+        match = re.match(r"(FAN)([0-9]+)-(1|2)", fan_name, re.I)
+        fan_index = None
+        if match:
+            i_list = list(match.groups())
+            fan_index = int(i_list[1])*2 - (int(i_list[2])%2)
+        return fan_index
+
+
     def get_num_fans(self):     
         """   
             Get the number of fans
@@ -36,19 +46,22 @@ class FanUtil():
         return num_fans
 
 
-    def get_fan_speed(self, index):
+    def get_fan_speed(self, fan_name):
         """
             Get the current speed of the fan, the unit is "RPM"  
             :return: int fan_speed
         """
 
-        # Set key and index.
-        fan_speed = 0
-        position_key = "Front" if index % 2 !=0 else "Rear"
-        index = int(round(float(index)/2))
-        fan_key = "Fan " + str(index) + " " + position_key
-
         try:
+            # Get real fan index
+            index = self.name_to_index(fan_name)
+
+            # Set key and index.
+            fan_speed = 0
+            position_key = "Front" if index % 2 !=0 else "Rear"
+            index = int(round(float(index)/2))
+            fan_key = "Fan " + str(index) + " " + position_key
+
             # Request and validate fan information.
             self.fru_data_list, self.sensor_data_list = self.request_data()
 
@@ -66,7 +79,7 @@ class FanUtil():
         return fan_speed
 
 
-    def  get_fan_low_threshold(self, index):
+    def  get_fan_low_threshold(self, fan_name):
         """
             Get the low speed threshold of the fan.
             if the current speed < low speed threshold, 
@@ -74,13 +87,16 @@ class FanUtil():
             :return: int fan_low_threshold
         """
 
-        # Set key and index.
-        fan_low_threshold = 0
-        position_key = "Front" if index % 2 !=0 else "Rear"
-        index = int(round(float(index)/2))
-        fan_key = "Fan " + str(index) + " " + position_key
-
         try:
+            # Get real fan index
+            index = self.name_to_index(fan_name)
+
+            # Set key and index.
+            fan_low_threshold = 0
+            position_key = "Front" if index % 2 !=0 else "Rear"
+            index = int(round(float(index)/2))
+            fan_key = "Fan " + str(index) + " " + position_key
+
             # Request and validate fan information.
             self.fru_data_list, self.sensor_data_list = self.request_data()
 
@@ -98,21 +114,24 @@ class FanUtil():
         return fan_low_threshold
 
 
-    def get_fan_high_threshold(self, index):
+    def get_fan_high_threshold(self, fan_name):
         """
             Get the hight speed threshold of the fan, 
             if the current speed > high speed threshold, 
             the status of the fan is not ok
-            :return: int fan_high_threshold
+            :return: int fan_high_threshold 
         """
 
-        # Set key and index.
-        fan_high_threshold = 0
-        position_key = "Front" if index % 2 !=0 else "Rear"
-        index = int(round(float(index)/2))
-        fan_key = "Fan " + str(index) + " " + position_key
-
         try:
+            # Get real fan index
+            index = self.name_to_index(fan_name)
+
+            # Set key and index.
+            fan_high_threshold = 0
+            position_key = "Front" if index % 2 !=0 else "Rear"
+            index = int(round(float(index)/2))
+            fan_key = "Fan " + str(index) + " " + position_key
+
             # Request and validate fan information.
             self.fru_data_list, self.sensor_data_list = self.request_data()
 
@@ -130,18 +149,21 @@ class FanUtil():
         return fan_high_threshold
 
 
-    def get_fan_pn(self, index):
+    def get_fan_pn(self, fan_name):
         """
             Get the product name of the fan
             :return: str fan_pn
         """
-
-        # Set key and index.
-        fan_pn = "N/A"
-        index = int(round(float(index)/2))
-        fan_fru_key = "FAN" + str(index) + " FRU"
         
         try:
+            # Get real fan index
+            index = self.name_to_index(fan_name)
+
+            # Set key and index.
+            fan_pn = "N/A"
+            index = int(round(float(index)/2))
+            fan_fru_key = "Fantray" + str(index)
+
             # Request and validate fan information.
             self.fru_data_list, self.sensor_data_list = self.request_data()
 
@@ -149,8 +171,8 @@ class FanUtil():
             for fan_fru in self.fru_data_list:
                 matching_fan = [s for s in fan_fru if fan_fru_key in s]
                 if matching_fan:
-                    serial = [s for s in fan_fru if "Product" in s]
-                    fan_pn = serial[0].split()[4]                 
+                    pn = [s for s in fan_fru if "Part" in s]
+                    fan_pn = pn[0].split()[4]                 
 
         except:
             return "N/A"
@@ -158,18 +180,20 @@ class FanUtil():
         return fan_pn
 
 
-    def get_fan_sn(self, index):
+    def get_fan_sn(self, fan_name):
         """
             Get the serial number of the fan
             :return: str fan_sn
         """
-
-        # Set key and index.
-        fan_sn = "N/A"
-        index = int(round(float(index)/2))
-        fan_fru_key = "FAN" + str(index) + " FRU"        
-        
         try:
+            # Get real fan index
+            index = self.name_to_index(fan_name)
+
+            # Set key and index.
+            fan_sn = "N/A"
+            index = int(round(float(index)/2))
+            fan_fru_key = "Fantray" + str(index)     
+            
             # Request and validate fan information.
             self.fru_data_list, self.sensor_data_list = self.request_data()
 
@@ -178,9 +202,29 @@ class FanUtil():
                 matching_fan = [s for s in fan_fru if fan_fru_key in s]
                 if matching_fan:
                     serial = [s for s in fan_fru if "Serial" in s]
-                    fan_sn = serial[0].split()[4]                 
+                    fan_sn = serial[0].split()[3]                 
 
         except:
             return "N/A"
 
         return fan_sn
+
+    def get_fans_name_list(self):
+        """
+            Get list of fan name.
+            :return: list fan_names
+        """
+        fan_names = []
+
+        # Get the number of fans
+        n_fan = self.get_num_fans()
+
+        # Set fan name and add to the list.
+        for x in range(1, n_fan + 1):
+            f_index = int(round(float(x)/2))
+            pos = 1 if x%2 else 2
+            fan_name = 'FAN{}-{}'.format(f_index, pos)
+            fan_names.append(fan_name)
+
+        return fan_names
+    
